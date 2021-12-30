@@ -8,7 +8,7 @@
 # We'll come back to this packages soon later on. I put this 
 # command here since it's good practice to list all your used 
 # packages at the beginning of a script
-library(tidyverse)
+# library(tidyverse)
 
 # Basic R syntax ----
 # What does this command do?

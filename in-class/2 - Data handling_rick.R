@@ -236,8 +236,8 @@ mean(test, na.rm = TRUE)
 # log(-54)
 
 # Lists - 1-dimensional, heterogeneous ----
-library(tidyverse)
-# martian_tb <- read_tsv("data/martians.txt")
+# library(tidyverse)
+martian_tb <- read_tsv("data/martians.txt")
 plant_lm <- lm(weight ~ group, data = PlantGrowth)
 plant_anova <- anova(plant_lm)
 typeof(plant_lm)

@@ -42,7 +42,7 @@ log(base = 2, 8)
 # Can you think of an example?
 
 c()
-library(tidyverse)
+# library(tidyverse)
 list.files()
 Sys.time()
 getwd()
@@ -210,7 +210,7 @@ mean(test, na.rm = TRUE)
 # log(-54)
 
 # Lists - 1-dimensional, heterogeneous ----
-library(tidyverse)
+# library(tidyverse)
 martian_tb <- read_tsv("data/martians.txt")
 plant_lm <- lm(weight ~ group, data = PlantGrowth)
 plant_anova <- anova(plant_lm)
