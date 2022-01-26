@@ -54,6 +54,10 @@ foo_df %>%
   filter(healthy != TRUE)
 
 foo_df %>% 
+  filter(!(healthy == TRUE))
+
+
+foo_df %>% 
   filter(!healthy)
 
 # Examples with foo_df: Numeric data
@@ -62,6 +66,7 @@ glimpse(foo_df)
 foo_df %>% 
   filter(quantity < 10)
 
+# foo_df$quantity < 10
 # What really happened
 # Calculate a logical vector using vector recycling:
 foo_df$quantity < 10

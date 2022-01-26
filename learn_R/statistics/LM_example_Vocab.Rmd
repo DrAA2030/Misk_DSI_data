@@ -1,0 +1,68 @@
+---
+title: "LM example - The Vocab Dataset"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(car)
+library(ggplot2)
+library(dplyr)
+```
+
+# Set-up
+
+Ensure you have the `ggplot2`, `dplyr` and `car` packages installed before trying to render this document in HTML.
+
+# The Data 
+
+```{r}
+glimpse(Vocab)
+```
+
+# The model
+
+```{r}
+# y ~ x
+my_model <- lm(vocabulary ~ education, data = Vocab)
+summary(my_model)
+```
+
+# Coefficients:
+# 1.6779       0.3319
+
+
+```{r}
+ggplot(Vocab, aes(x = education, y = vocabulary)) +
+  geom_jitter(shape = 16, alpha = 0.4) +
+  geom_smooth(method = "lm", color = "red")
+```
+
+# "Predict"
+
+Manually:
+
+```{r}
+# score: 6 years of edu
+1.6779 + 0.3319 * 6
+
+```
+
+Using the extracted coefficients
+
+```{r}
+edu <- 6
+b_0 <- coefficients(my_model)[1]
+b_1 <- coefficients(my_model)[2]
+
+b_0 + b_1 * edu
+
+```
+
+
+Using the `predict()` function:
+
+```{r}
+predict(my_model, data.frame(education = 6))
+```
+
