@@ -1,0 +1,127 @@
+---
+title: "The Distribution of the Sample Means"
+output:
+  html_document:
+    toc: true
+    theme: united
+---
+
+```{r setup, inclue=FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, cache = TRUE)
+options(digits = 2)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+popln_size <- 40
+set.seed(136)
+popln <- data.frame(ind = rnorm(popln_size, mean = 30, sd = 4))
+```
+
+Imagine we have a finite population of `r popln_size` individuals:
+
+```{r}
+library(ggplot2)
+ggplot(popln, aes(ind, 1)) +
+  geom_dotplot(binwidth = 0.2, fill = "#e41a1c", color = NA) +
+  coord_fixed(3) +
+  # scale_y_continuous(limits = c(0, 0.25)) +
+  scale_x_continuous(limits = c(16, 41), breaks = 16:41, expand = c(0,0)) +
+  theme_bw() +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+  # geom_point(position = position_jitter(height = 0.3))
+```
+
+```{r}
+sample_size <- 2
+# Number of possible combinations (without replacement):
+combo_total <- choose(n = popln_size, k = sample_size)
+```
+
+The true mean of the population is `r mean(popln)`. If we take samples, each containing `r sample_size` individuals, we'd have `r combo_total` possible combinations, i.e. individual sample mean values, $\bar{x_i}$, describe by $\bar{X}$..
+
+Choosing `r sample_size` individuals from the population and calculating their $\bar{x}$ is the same as taking one $\bar{x_i}$ from $\bar{X}$.
+
+Let's calculate all the possible means:
+
+```{r}
+# get combinations:
+library(combinat)
+all_means <- colMeans(combn(popln$ind, sample_size))
+```
+
+```{r}
+
+sample_means <- data.frame(means = all_means)
+
+library(ggplot2)
+ggplot(sample_means, aes(all_means, 1)) +
+  geom_dotplot(binwidth = 0.2, fill = "#377eb8", color = NA) +
+  coord_fixed(3) +
+  # scale_y_continuous(limits = c(0, 0.25)) +
+  scale_x_continuous(limits = c(16, 41), breaks = 16:41, expand = c(0,0)) +
+  theme_bw() +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+
+```
+
+The mean of all possible means will match the mean of the population. If we increase the sample size to 4, we would decrease the range, and thus the standard deviation of the distribution of all sample means:
+
+```{r}
+sample_size <- 4
+# Number of possible combinations (without replacement):
+combo_total <- choose(n = popln_size, k = sample_size)
+# combo_total
+
+# get combinations:
+all_means <- colMeans(combn(popln$ind, sample_size))
+sample_means <- data.frame(means = all_means)
+
+library(ggplot2)
+ggplot(sample_means, aes(all_means, 1)) +
+  geom_dotplot(binwidth = 0.2, fill = "#377eb8", color = NA) +
+  coord_fixed(3) +
+  # scale_y_continuous(limits = c(0, 0.25)) +
+  scale_x_continuous(limits = c(16, 41), breaks = 16:41, expand = c(0,0)) +
+  theme_bw() +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+
+```
+
+If we take it to extremes, and increase the sample size to 35, which takes almost 90% of the population, the range gets very narrow.
+
+```{r}
+sample_size <- 35
+# Number of possible combinations (without replacement):
+# combo_total <- choose(n = popln_size, k = sample_size)
+# combo_total
+
+# get combinations:
+all_means <- colMeans(combn(popln$ind, sample_size))
+sample_means <- data.frame(means = all_means)
+
+library(ggplot2)
+ggplot(sample_means, aes(all_means, 1)) +
+  geom_dotplot(binwidth = 0.2, fill = "#377eb8", color = NA) +
+  coord_fixed(3) +
+  # scale_y_continuous(limits = c(0, 0.25)) +
+  scale_x_continuous(limits = c(16, 41), breaks = 16:41, expand = c(0,0)) +
+  theme_bw() +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+
+```
+
+Thus, we can see that the SEM, $\sigma^2_{\bar{X}}$, decreases as $n$ increases. This is reflected in the equation $\sigma/\sqrt{n}$.

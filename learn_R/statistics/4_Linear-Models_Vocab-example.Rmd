@@ -1,10 +1,14 @@
 ---
 title: "LM example - The Vocab Dataset"
-output: html_document
+output:
+  html_document:
+    toc: true
+    theme: united
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, inclue=FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+options(digits = 2)
 library(car)
 library(ggplot2)
 library(dplyr)
@@ -28,8 +32,8 @@ my_model <- lm(vocabulary ~ education, data = Vocab)
 summary(my_model)
 ```
 
-# Coefficients:
-# 1.6779       0.3319
+Coefficients:
+1.6779       0.3319
 
 
 ```{r}
@@ -58,7 +62,6 @@ b_1 <- coefficients(my_model)[2]
 b_0 + b_1 * edu
 
 ```
-
 
 Using the `predict()` function:
 

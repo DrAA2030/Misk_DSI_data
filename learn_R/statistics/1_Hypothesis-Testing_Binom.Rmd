@@ -1,0 +1,172 @@
+---
+title: "Hypothesis Testing 101: Binary data"
+output:
+  html_document:
+    toc: true
+    theme: united
+---
+
+```{r setup, inclue=FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+options(digits = 2)
+library(ggplot2)
+library(dplyr)
+```
+
+## Example 1: Extreme Coin-tossing
+
+```{r}
+n <- 10        # Number of trials/observations/individuals/tosses
+p_succ <- 0.5  # Probability of success. An assumption, becomes the null hypothesis
+obs <- 9       # The observed number of successes in n trials
+```
+
+Imagine you have a friend who tells you the tossed a coin `r n` times and observed `r obs` heads, i.e. "successes". How likely is this result?
+
+### Step 1: Make a Null Hypothesis and assume that it's true. 
+
+First, you assume that the $p(succ) =$ `r p_succ` is true, i.e. it's a fair coin, this is our null hypothesis $H_0$.
+
+### Step 2: Draw the Null distribution
+
+Assuming that the $H_0$ is correct, what do you expect the world to look like? 
+
+```{r}
+library(ggplot2)
+null_dist <- dbinom(0:n, size = n, prob = p_succ)
+data.frame(prob = null_dist,
+           n = 0:n) %>% 
+  ggplot(aes(n, prob)) +
+  geom_col() +
+  scale_x_continuous(breaks = 0:n)
+```
+
+### Step 3: Place our obs on the distribution
+
+Find your observation on the Null Distribution and add up all the point probabilities of cases that are as extreme -- or more extreme -- as what we observe.
+
+```{r}
+
+results <- data.frame(probability = null_dist,
+                      successes = 0:n)
+
+# Right hand side
+results %>% 
+  filter(successes >= obs) %>% 
+  summarise(total = sum(probability)) %>% 
+  pull(total) -> right_tail
+
+# right_tail <- sum(null_dist[(obs+1):length(null_dist)]) # 12 daughters
+
+# Left hand side
+results %>% 
+  filter(successes <= n - obs) %>% 
+  summarise(total = sum(probability)) %>% 
+  pull(total) -> left_tail
+
+# left_tail <- sum(null_dist[1:((n - obs) + 1)]) # 12 daughters
+
+# Total
+p_value <- right_tail + left_tail 
+```
+
+Adding up all these probabilities is the p-value: `r p_value`!
+
+### Step 4: Make a decision
+
+The p-value says:
+
+>How likely is it to observe what I observed, _or_ something more extreme, _if_ the null hypothesis was true?
+
+If this is below some threshold, e.g. 0.05, then we consider our observations to be an unlikely result. Thus, you **reject the Null Hypothesis**. You can never say what the $p(succ)$ is, because you have just tested for how likely the hypothesized value is.
+
+Another way of thinking abou the p-value:
+
+>If the null hypothesis $H_0: p(succ) =$ `r p_succ` was true, I would observe my results -- or something more extreme -- `r p_value*100`% of the time.
+
+Does this hold true? Let's test it out by performing _a lot_ of experiments:
+
+```{r}
+
+results <- NULL
+experiments <- 30000                # the number of experiments
+set.seed(1369)
+for (i in 1:experiments) {
+  results <- c(results, sum(sample(0:1, n, TRUE))) # n, number of coin tosses, from above
+}
+# barplot(table(results))
+data.frame(proportion = as.vector(table(results)/experiments),
+           successes = 0:n) -> results_table 
+
+results_table %>% 
+  filter( (successes <= (n-obs)) | (successes >= obs)) %>%        # obs from above
+  summarise(total = sum(proportion)) %>% 
+  pull(total) -> observed_results
+
+ggplot(results_table, aes(successes, proportion)) +
+  geom_col() +
+  scale_x_continuous(breaks = 0:n) +
+  ggtitle("Observed results")
+```
+
+The expected proportion of our results is `r p_value`, and when we did the experiment, we observed an actual result of `r observed_results`! Not bad!
+
+## Example 2: French Farmers with Big Families
+
+Imagine I have found a  French farming family of with 12 children -- and they are all female (or all male)! Is this an unusual result? i.e. How likely is it to observe this result, or something more extreme?
+
+### Step 1: Make a Null Hypothesis and assume that it's true. 
+
+Assume that $p(succ)$ (i.e. $p(female)$) = 0.5
+
+```{r}
+
+n <- 12 # Comes from the sample
+p_succ <- 0.5 # Comes from our assumption -> H_0 (null hypothesis)
+
+```
+
+### Step 2: Draw the Null distribution
+
+i.e. What do we expect to see?
+
+Possible outcomes: n+1 (0 daughters or 12 daughters)
+
+```{r}
+null_dist <- dbinom(0:n, size = n, prob = p_succ)
+data.frame(prob = null_dist,
+           n = 0:n) %>% 
+  ggplot(aes(n, prob)) +
+  geom_col() 
+
+```
+
+
+### Step 3: Place our obs on the distribution
+
+Quantify how likely is it to observe our observed value **OR** more extreme
+
+```{r}
+obs <- 12
+# 12 daughters
+# null_dist[obs+1] 
+
+# 0 daughters
+# null_dist[1] 
+
+# 0 or 12 daughters
+p_value <- null_dist[1]*2 # 0.00048
+```
+
+
+### Step 4: Make a decision
+
+How likely is it to observe this and should I be excited? There is a probability of `r p_value` (i.e. this p-value). Let's revisit the p-value once more. Recall, it states:
+
+>What is the probability of observing what I observe -- or more extreme -- assuming that the H_0 is true? here: `r p_value`.
+
+Thus, there is a `r p_value * 100`% chance to observe this. This is much lower than the cut off of 5% (i.e. probability of 0.05). Thus, we have to REJECT the $H_0$. It seems there is something interesting happening... or is there? In the absence of any explanation, we can imagine there there is something that we've missed, but we can also imagine that we happened upon the fluke chance of observing this rare event -- someone always wins the lottery, after all!
+
+Another way of understanding this result:
+
+>There is a 1 in `r 1/p_value` chance of observing this result. Thus, if I surveyed 2083 French farmer families with 12 children, I would expect to see 1 family that had only girls or only boys.

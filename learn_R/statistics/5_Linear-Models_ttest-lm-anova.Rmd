@@ -1,0 +1,167 @@
+---
+title: "LM vs t-test vs ANOVA"
+output:
+  html_document:
+    toc: true
+    theme: united
+---
+
+```{r setup, inclue=FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+options(digits = 2)
+library(car)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+## 2-sample t-test
+
+The data
+
+```{r}
+my_sleep <- sleep[-3]
+glimpse(my_sleep)
+```
+
+```{r}
+summary(my_sleep)
+```
+
+```{r}
+ggplot(my_sleep, aes(x = group, y = extra)) +
+  geom_jitter(width = 0.1) +
+  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), color = "#e41a1c")
+```
+
+
+1. Do a classic 2-sample t-test
+
+```{r}
+# classic 2- sample t-test
+t.test(extra ~ group, data = my_sleep, var.equal = TRUE)
+
+```
+
+2. A Welch's version of the 2-sample t-test (don't assume variances are equal)
+
+```{r}
+# Welch's 2-sample t-test
+t.test(extra ~ group, data = my_sleep)
+```
+
+3. As a linear model, using `lm()`. Interpret the results.
+
+```{r}
+# As a linear model
+my_sleep_lm <- lm(extra ~ group, data = my_sleep)
+my_sleep_lm
+```
+
+```{r}
+summary(my_sleep_lm)
+```
+
+4. As an ANOVA, using `anova()`. Interpret the results.
+
+```{r}
+# As an ANOVA
+anova(my_sleep_lm)
+
+```
+
+## Linear Model
+
+The data:
+
+```{r}
+lm_data_wide <- data.frame(xx = c(2, 3, 5, 6),
+                      yy = c(2, 5, 4, 7))
+glimpse(lm_data_wide)
+```
+
+```{r}
+ggplot(lm_data_wide, aes(x = xx, y = yy)) +
+  geom_point()
+```
+
+```{r}
+# We should actually have "tidy" data
+# MEASURE VARIABLES = columns that should become "tidy"
+# here, it's all of them.
+lm_data_wide %>% 
+  pivot_longer(everything(), 
+               names_to = "group", 
+               values_to = "value") -> lm_data_tidy
+glimpse(lm_data_tidy)
+```
+
+```{r}
+ggplot(lm_data_tidy, aes(x = group, y = value)) +
+  geom_point()
+
+```
+
+1. Use the wide format data and do an `lm()`
+
+```{r}
+# An OLS LM
+my_lm <- lm(value ~ group, data = lm_data_tidy)
+summary(my_lm)
+```
+
+2. Can you do a t-test on either of these formats?
+
+Using the wide format:
+
+```{r}
+# A t-test
+t.test(lm_data_wide$xx, lm_data_wide$yy)
+```
+Using the tidy format:
+
+```{r}
+# A t-test
+t.test(value ~ group, data = lm_data_tidy)
+
+```
+
+
+3. Calculate an anova, using `anova()`.
+
+```{r}
+# As an ANOVA
+anova(my_lm)
+```
+
+
+## Data for 1-way ANOVA
+
+```{r}
+data(PlantGrowth)
+glimpse(PlantGrowth)
+```
+
+```{r}
+summary(PlantGrowth)
+```
+```{r}
+ggplot(PlantGrowth, aes(x = group, y = weight)) +
+  geom_jitter(width = 0.1)
+```
+
+1. Do an `lm()` on this data.
+
+```{r}
+# lm
+plant_lm <- lm(weight ~ group, data = PlantGrowth)
+summary(plant_lm)
+```
+
+2. Calcualte an anova table with `anova()`.
+
+```{r}
+# ANOVA
+anova(plant_lm)
+```
+

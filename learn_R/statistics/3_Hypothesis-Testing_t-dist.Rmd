@@ -1,0 +1,94 @@
+---
+title: "Hypothesis Testing 102"
+output:
+  html_document:
+    toc: true
+    theme: united
+---
+
+```{r setup, inclue=FALSE, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, cache = TRUE)
+# options(digits = 4)
+library(dplyr)
+```
+
+# Setup
+
+```{r}
+x_bar <- 200
+hypo <- 195
+s <- 6
+n <- 10
+
+```
+
+# Hypothesis testing using test statistic
+
+What we called "Method #3" in class and what we usually think about when we talk about hypothesis testing.
+
+```{r}
+signal <- x_bar - hypo
+noise <- s/sqrt(n) # SEM
+
+test_statistic <- signal/noise
+test_statistic
+```
+
+What's the critical value (aka the cutoff) for
+
+According to the Standard Normal Distribution:
+
+```{r}
+qnorm(0.975, mean = 0, sd = 1) # 1.96
+# qnorm(0.5, mean = 0, sd = 1) # 0
+# pnorm(1.96, mean = 0, sd = 1)
+```
+
+According to the t Distribution:
+
+```{r}
+# The t-dist:
+qt(0.975, df = n-1) # 2.26
+# qt(0.975, df = 74) # 1.99
+```
+
+The p-value:
+
+```{r}
+# The 2-sided p-value
+(1 - pt(test_statistic, df = n - 1)) * 2
+```
+
+# Hypothesis testing using 95% CI
+
+What we called "Method #1" in class and a perfectly acceptable form of hypothesis testing.
+
+```{r}
+err_N <- qnorm(0.975, mean = 0, sd = 1) # 1.96
+lower_N <- x_bar - (err_N * noise)
+upper_N <- x_bar + (err_N * noise)
+```
+
+Using the Normal distribution: `r c(lower_N, upper_N)`.
+
+```{r}
+err_t <- qt(0.975, df = n - 1) # 2.26
+lower_t <- x_bar - (err_t * noise)
+upper_t <- x_bar + (err_t * noise)
+```
+
+Using the t-distribution: `r c(lower_t, upper_t)`.
+
+# Built in
+
+```{r}
+
+# getwd()
+read.delim("~/Documents/Misk_DSI_data/data/martians.txt") %>%
+  filter(Site == "Site I") %>%
+  select(Height) %>%
+  pull(Height) -> site_I_height
+
+t.test(site_I_height, mu = hypo)
+
+```
