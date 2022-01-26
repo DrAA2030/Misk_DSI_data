@@ -20,6 +20,12 @@ glimpse(my_sleep)
 ```{r}
 summary(sleep)
 ```
+
+1. Do a classic and... 
+2. A welch's version of the t-test.
+
+3. Do a `lm()` and interpret the results
+
 ## Data for LM
 
 ```{r}
@@ -50,8 +56,9 @@ ggplot(lm_data_tidy, aes(x = group, y = value)) +
 ```
 
 
-
-
+1. Use the wide format data and do an `lm()`
+2. Can you do a t-test on either of these formats?
+3. Calcualte an anova table with `anova()`.
 
 ## Data for 1-way ANOVA
 
@@ -68,3 +75,5 @@ ggplot(PlantGrowth, aes(x = group, y = weight)) +
   geom_jitter(width = 0.1)
 ```
 
+1. Do an `lm()` on this data.
+2. Calcualte an anova table with `anova()`.
