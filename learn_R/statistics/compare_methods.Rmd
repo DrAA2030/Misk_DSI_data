@@ -1,0 +1,70 @@
+---
+title: "LM vs t-test vs ANOVA"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+## Data for 2-sample t-test
+
+```{r}
+my_sleep <- sleep[-3]
+glimpse(my_sleep)
+```
+
+```{r}
+summary(sleep)
+```
+## Data for LM
+
+```{r}
+lm_data_wide <- data.frame(xx = c(2, 3, 5, 6),
+                      yy = c(2, 5, 4, 7))
+glimpse(lm_data_wide)
+```
+```{r}
+ggplot(lm_data_wide, aes(x = xx, y = yy)) +
+  geom_point()
+```
+
+```{r}
+# We should actually have "tidy" data
+# MEASURE VARIABLES = columns that should become "tidy"
+# here, it's all of them.
+lm_data_wide %>% 
+  pivot_longer(everything(), 
+               names_to = "group", 
+               values_to = "value") -> lm_data_tidy
+glimpse(lm_data_tidy)
+```
+
+```{r}
+ggplot(lm_data_tidy, aes(x = group, y = value)) +
+  geom_point()
+
+```
+
+
+
+
+
+## Data for 1-way ANOVA
+
+```{r}
+data(PlantGrowth)
+glimpse(PlantGrowth)
+```
+
+```{r}
+summary(PlantGrowth)
+```
+```{r}
+ggplot(PlantGrowth, aes(x = group, y = weight)) +
+  geom_jitter(width = 0.1)
+```
+
