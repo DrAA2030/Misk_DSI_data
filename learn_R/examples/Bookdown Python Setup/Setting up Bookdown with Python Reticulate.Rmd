@@ -1,0 +1,45 @@
+---
+title: "Setting up Bookdown with Python Reticulate"
+output: html_document
+---
+
+```r
+install.packages("reticulate")
+library(reticulate)
+install_miniconda()
+conda_list()
+```
+
+You'll see two virtual envs at least:
+
+- `Base R`
+- `r-reticulate` with typical DS Python packages (pandas, numpy, etc.)
+
+Copy address: e.g. 
+`/Users/milou/Library/r-miniconda/envs/r-reticulate/bin/python`
+
+Specify the paths to your miniconda env in the first chunk of your Bookdown `index.Rmd`:
+
+```r
+knitr::opts_chunk$set(python.reticulate = TRUE,
+                      engine.path = list(
+                        python = '/Users/milou/Library/r-miniconda/envs/r-reticulate/bin/python',
+                        ruby = '/usr/local/bin/ruby'
+                        ))
+library(reticulate)
+```
+
+In you need to install other Python packages into the miniconda env:
+
+```r
+conda_install("r-reticulate", "scikit-learn")
+```
+
+Print out the Python env information, use:
+
+```r
+py_config()
+```
+
+
+
